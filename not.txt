@@ -1,0 +1,12 @@
+projeyi çalıştırmak için npm run dev
+<div class="yazi">
+        
+    </div>
+    <div>
+        bu kısım Ece için
+    </div>
+    <MyButton></MyButton>
+    <HeaderComponent></HeaderComponent>
+
+
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
