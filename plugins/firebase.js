@@ -3,14 +3,14 @@ import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 
 export default defineNuxtPlugin((nuxtApp) => {
-    const firebaseConfig = {
-        apiKey: "AIzaSyC13v42EI8kXmhPMBiw46NK_Vj4R5RBGVY",
-        authDomain: "proje-8c192.firebaseapp.com",
-        projectId: "proje-8c192",
-        storageBucket: "proje-8c192.firebasestorage.app",
-        messagingSenderId: "545440960322",
-        appId: "1:545440960322:web:85c9cd4f591af88a4e82db"
-      };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBYj-7GOtwmWjJuO4aASY8lp2qXaCUyMrs",
+    authDomain: "webproje-9eec1.firebaseapp.com",
+    projectId: "webproje-9eec1",
+    storageBucket: "webproje-9eec1.firebasestorage.app",
+    messagingSenderId: "279040144677",
+    appId: "1:279040144677:web:1921d8e137a7286b7f96cc"
+  };
 
   // Firebase App'i başlat
   const firebaseApp = initializeApp(firebaseConfig)
