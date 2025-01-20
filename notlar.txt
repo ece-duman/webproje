@@ -1,3 +1,0 @@
-yazdığımız kodu çalıştırmak için terminal ekranından
-npm run dev
-yazıyoruz
