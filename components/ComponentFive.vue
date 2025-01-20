@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 right-0 w-96 bg-white shadow-lg z-50 flex flex-col">
+  <div v-if="isVisible" class="fixed inset-0 right-0 w-96 bg-white shadow-lg z-50 flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
       <h2 class="text-lg font-bold text-purple-700 flex items-center space-x-2">
@@ -12,37 +12,40 @@
     <!-- Cart Items -->
     <div class="flex-1 overflow-y-auto p-4">
       <div
-        v-for="(item, index) in cartItems"
-        :key="index"
+        v-for="(item, index) in cartStore.cartItems"
+        :key="item.id"
         class="cart-item rounded-lg shadow-md hover:shadow-lg p-4 border border-gray-200 relative transition transform hover:scale-105"
       >
-        <img :src="item.image" alt="Ürün Resmi" class="book-image mr-4" />
+        <img :src="item.icon" alt="Ürün Resmi" class="book-image mr-4" />
         <div class="cart-item-content">
           <div class="flex-1">
-            <p class="text-sm font-semibold">{{ item.title }}</p>
-            <p class="text-sm text-gray-600">{{ item.author }}</p>
-            <p class="text-sm text-gray-500">{{ item.publisher }}</p>
+            <p class="text-sm font-semibold">{{ item.isim }}</p>
+            <p class="text-sm text-gray-600">{{ item.yazar }}</p>
+            <p class="text-sm text-gray-500">{{ item.yayinevi }}</p>
           </div>
           <div class="price-section flex items-center justify-between w-full">
             <div class="flex flex-col items-center">
-              <p class="text-lg font-bold text-purple-600">{{ item.price }} TL</p>
+              <p class="text-lg font-bold text-purple-600">{{ item.fiyat }} TL</p>
               <div class="flex items-center mt-2">
                 <button
-                  @click="decreaseQuantity(index)"
+                  @click="cartStore.decreaseQuantity(index)"
                   class="border border-gray-300 px-2 py-1 text-gray-600 hover:bg-gray-100"
                 >
                   -
                 </button>
                 <span class="mx-2">{{ item.quantity }}</span>
                 <button
-                  @click="increaseQuantity(index)"
+                  @click="cartStore.increaseQuantity(index)"
                   class="border border-gray-300 px-2 py-1 text-gray-600 hover:bg-gray-100"
                 >
                   +
                 </button>
               </div>
             </div>
-            <button @click="removeItem(index)" class="text-red-500 hover:text-red-700 ml-2 absolute top-2 right-2">
+            <button
+              @click="cartStore.removeItem(index)"
+              class="text-red-500 hover:text-red-700 ml-2 absolute top-2 right-2"
+            >
               🗑
             </button>
           </div>
@@ -54,15 +57,15 @@
     <div class="p-4 border-t">
       <div class="flex justify-between mb-2">
         <span>Sepet Toplamı</span>
-        <span class="font-bold">{{ cartTotal.toFixed(2) }} TL</span>
+        <span class="font-bold">{{ cartStore.cartTotal.toFixed(2) }} TL</span>
       </div>
       <div class="flex justify-between mb-2">
         <span>Kargo Ücreti</span>
-        <span class="font-bold">{{ shippingFee.toFixed(2) }} TL</span>
+        <span class="font-bold">{{ cartStore.shippingFee.toFixed(2) }} TL</span>
       </div>
       <div class="flex justify-between mb-4">
         <span>Genel Toplam</span>
-        <span class="font-bold text-purple-700">{{ grandTotal.toFixed(2) }} TL</span>
+        <span class="font-bold text-purple-700">{{ cartStore.grandTotal.toFixed(2) }} TL</span>
       </div>
       <button
         @click="goToCart"
@@ -70,84 +73,42 @@
       >
         SEPETE GİT
       </button>
-      <button
-        @click="checkout"
-        class="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition"
-      >
-        SATIN AL
-      </button>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useCartStore } from '~/stores/cart' // <-- Yolunuzu burada düzeltin
 
-export default defineComponent({
-  name: 'CartSidebar',
-  data() {
-    return {
-      cartItems: [
-        {
-          image: '/sepetim/hepimiz-gokyuzu-olmak-istedik-4-efsaneler-ve-lanetler-hc-919534-49-K.jpg',
-          title: 'Hepimiz Gökyüzü Olmak İstedik 4',
-          author: 'N. G. Kabal',
-          publisher: 'Dex Yayınevi',
-          price: 400.95,
-          quantity: 1,
-        },
-        {
-          image: '/sepetim/sehadet-vatan-icin-924070-49-O.png',
-          title: 'Şehadet Vatan İçin',
-          author: 'Tuğçe Aksal Karaoğlan',
-          publisher: 'Parola Yayınları',
-          price: 192.0,
-          quantity: 1,
-        },
-        {
-          image: '/sepetim/siyam-545196-37-K.jpg',
-          title: 'Siyam IV Mare',
-          author: 'Beyza Aksoy',
-          publisher: 'Epsilon Yayınevi',
-          price: 252.8,
-          quantity: 1,
-        },
-      ],
-      shippingFee: 49.9,
-    };
-  },
-  computed: {
-    cartTotal(): number {
-      return this.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-    },
-    grandTotal(): number {
-      return this.cartTotal + this.shippingFee;
-    },
-  },
-  methods: {
-    closeSidebar() {
-      console.log('Sidebar kapatıldı');
-    },
-    increaseQuantity(index: number) {
-      this.cartItems[index].quantity++;
-    },
-    decreaseQuantity(index: number) {
-      if (this.cartItems[index].quantity > 1) {
-        this.cartItems[index].quantity--;
-      }
-    },
-    removeItem(index: number) {
-      this.cartItems.splice(index, 1);
-    },
-    goToCart() {
-      this.$router.push('/cart');
-    },
-    checkout() {
-      this.$router.push('/checkout');
-    },
-  },
-});
+const message = ref('')
+
+// Pinia'daki store'u kullan
+const cartStore = useCartStore()
+const cartItems = computed(() => cartStore.cartItems)
+
+
+// Yan panel görünür mü kapalı mı tutmak için
+const isVisible = ref(true)
+
+// Sayfa yönlendirmeleri için router
+const router = useRouter()
+
+function closeSidebar() {
+  isVisible.value = false
+}
+
+const goToCart = ()  =>{
+  router.push('/sepet')
+}
+
+// Bileşen yüklendiğinde verileri çek
+onMounted(() => {
+  cartStore.initCartListener()
+})
 </script>
+
 
 <style scoped>
 html,
@@ -238,6 +199,7 @@ body {
 .close-button:hover {
   color: black; /* Üzerine gelindiğinde renk değişimi */
 }
+
 button.bg-orange-500 {
   background-color: #ff8000; /* Turuncu arka plan */
 }
@@ -245,6 +207,7 @@ button.bg-orange-500 {
 button.bg-orange-500:hover {
   background-color: #e67300; /* Hoverda daha koyu turuncu */
 }
+
 button.bg-purple-700 {
   background-color: #56008e; /* Mor arka plan */
   margin-bottom: 0.5rem; /* Alt boşluk */
@@ -254,4 +217,3 @@ button.bg-purple-700:hover {
   background-color: #4c0078; /* Hoverda daha koyu mor */
 }
 </style>
-  

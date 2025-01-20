@@ -1,23 +1,23 @@
 <template>
   <div>
     <h2>ÇOK SATANLAR</h2>
-    
+
     <!-- Kaydırılabilir Alan -->
     <div class="slider-container">
       <!-- Kaydırma Butonları -->
       <div class="slider-buttons left" @click="scrollLeft"> < </div>
       <div class="slider-buttons right" @click="scrollRight"> > </div>
-      
+
       <!-- Kartlar Dinamik Olarak Yüklenecek -->
       <div class="cards-container" ref="cardsContainer">
-        <div 
-          v-for="(card, index) in visibleCards" 
-          :key="index" 
+        <div
+          v-for="(card, index) in visibleCards"
+          :key="index"
           class="card"
         >
-          <img 
-            :src="card.img" 
-            class="card-img-top" 
+          <img
+            :src="card.img"
+            class="card-img-top"
             alt="Example Image"
           />
           <div class="card-body">
@@ -32,12 +32,12 @@
             <p class="card-text">
               {{ card.publisher }}<br>{{ card.author }}
             </p>
-            
+
             <!-- Fiyat Butonu -->
-            <button 
-              class="btn btn-primary" 
+            <button
+              class="btn btn-primary"
               :data-price="card.price"
-              @click="openModal(card)"
+              @click="addToCart(card)"
             >
               {{ card.price }}
             </button>
@@ -48,13 +48,12 @@
 
     <!-- Navigasyon Yuvarlakları -->
     <div class="navigation-dots">
-      <span 
-        v-for="(dot, index) in totalPages" 
+      <span
+        v-for="(dot, index) in totalPages"
         :key="index"
-        :class="['dot', { active: currentIndex === index }]" 
+        :class="['dot', { active: currentIndex === index }]"
         @click="goToPage(index)"
-      >
-      </span>
+      ></span>
     </div>
 
     <!-- Modal Component (Göster/Gizle) -->
@@ -66,81 +65,61 @@
   </div>
 </template>
 
-<script>
-import ComponentFour from './ComponentFour.vue';
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useCartStore } from '~/stores/cart';
 
-export default {
-  components: {
-    ComponentFour,
-  },
-  data() {
-    return {
-      cards: [
-        { img: '/icons/bulbul-kapani-1-hediyeli-ozel-kutu-920473-49-K 1.jpg', name: 'Bülbül Kapanı 1', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'249.99TL' },
-        { img: '/icons/menu4_files/yasamak-139530-171631-13-O.jpg', name: 'Yaşamak', publisher: 'Jaogur Kitap', author: 'Yu Hua', price:'99.99TL' },
-        { img: '/icons/3.jpg', name: 'Efsaneler ve Lanetler ', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'249.99TL' },
-        { img: '/icons/4.png', name: 'Şehadet Vatan İçin', publisher: 'İthaki Yayınları', author: 'Loresima', price:'50TL' },
-        { img: '/icons/5.jpg', name: 'Siyam', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'150TL' },
-        { img: '/icons/6.png', name: 'Medusa Ve Ölü Kumları', publisher: 'Can Yayınları', author: 'MARAL ATMACA', price:'150TL' },
-        { img: '/icons/7.png', name: 'İmpratorluk Kılıcı', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'50TL' },
-        { img: '/icons/8.png', name: 'Yırtıcı Kuşar Zamanı', publisher: 'Ephesus Yayınları', author: 'AHMET ÜMİT', price:'150TL' },
-        { img: '/icons/9.png', name: 'Oyunbaz', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'50TL' },
-        { img: '/public/icons/10.jpg', name: 'Beyaz leke', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'150TL' },
-        { img: '/icons/11.png', name: 'Bir Kibritle Yok olmak ', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'99.99TL' },
-        { img: '/icons/12.jpg', name: 'Biliçaltının gücü ', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'150TL' },
-        { img: '/icons/13.jpg', name: 'Rezonans kanunu ', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'350TL' },
-        { img: '/icons/14..jpg', name: 'Cumhuriyet\'in ilk sabahı ', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'150TL' },
-        { img: '/icons/14.png', name: 'Dikkat zengin yapabilir', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'158TL' },
-        { img: '/icons/15.jpg', name: 'İnsanlığımı yitirirken', publisher: 'Ephesus Yayınları', author: 'VICTOR HUGO', price:'20TL' },
-        { img: '/icons/16.jpg', name: 'Bir idam mahkumunun son günü', publisher: 'Ephesus Yayınları', author: 'VICTOR HUGO', price:'99.99TL' },
-        { img: '/icons/17.jpg', name: 'Martın eden', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'99.99TL' },
-        { img: '/icons/18.png', name: 'Gece Yarısı Kütüphanesi', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'79.99TL' },
-        { img: '/icons/19.png', name: 'intermezzo', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'99.99TL' },
-        { img: '/icons/20.jpg', name: 'insanlar', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'79.99TL' },
-        { img: '/icons/ihtilal-2-922514-49- 2.png', name: 'ölmek', publisher: 'Ephesus Yayınları', author: 'Loresima', price:'99.99TL' },
-      ],
-      currentIndex: 0,
-      showModal: false,        // Modal görünürlük kontrolü
-      selectedProduct: null,   // Seçilen ürünü depolamak için
-    };
-  },
-  computed: {
-    // Görünen 6 kart
-    visibleCards() {
-      return this.cards.slice(this.currentIndex, this.currentIndex + 6);
-    },
-    // Toplam sayfa sayısı
-    totalPages() {
-      return Math.ceil(this.cards.length / 6);
-    },
-  },
-  methods: {
-    // Modal'ı aç
-    openModal(card) {
-      this.selectedProduct = card;
-      this.showModal = true;
-    },
-    // Modal'ı kapat
-    closeModal() {
-      this.showModal = false;
-      this.selectedProduct = null;
-    },
-    // Sola kaydırma
-    scrollLeft() {
-      if (this.currentIndex > 0) {
-        this.currentIndex -= 1;
-      }
-    },
-    // Sağa kaydırma
-    scrollRight() {
-      if (this.currentIndex + 1 < this.cards.length) {
-        this.currentIndex += 1;
-      }
-    },
-    goToPage(index) {
-      this.currentIndex = index * 6;
-    },
-  },
+// Modal kontrol vb. değişkenler
+const showModal = ref(false);
+const selectedProduct = ref(null);
+const currentIndex = ref(0);
+
+// Pinia store'u kullanarak verileri alıyoruz
+const cokSatanlarStore = useCokSatanlarStore();
+const cards = computed(() => cokSatanlarStore.cards);
+
+// Modal fonksiyonları
+const openModal = (card) => {
+  selectedProduct.value = card;
+  showModal.value = true;
+};
+const closeModal = () => {
+  showModal.value = false;
+  selectedProduct.value = null;
+};
+
+// Sepete ekleme fonksiyonu
+const addToCart = async (card) => {
+  await cokSatanlarStore.addToCart(card);
+  openModal(card); // Modalı açarak kullanıcıya bilgi ver
+};
+
+// Bileşen yüklendiğinde verileri çek
+onMounted(() => {
+  cokSatanlarStore.fetchCokSatanlar();
+});
+
+// Slider’daki görüntüleme
+const visibleCards = computed(() => {
+  return cards.value.slice(currentIndex.value, currentIndex.value + 6);
+});
+const totalPages = computed(() => {
+  return Math.ceil(cards.value.length / 6);
+});
+
+// Kaydırma fonksiyonları
+const scrollLeft = () => {
+  if (currentIndex.value > 0) {
+    currentIndex.value--;
+  }
+};
+const scrollRight = () => {
+  if (currentIndex.value + 1 < cards.value.length) {
+    currentIndex.value++;
+  }
+};
+const goToPage = (index) => {
+  currentIndex.value = index * 6;
 };
 </script>
 

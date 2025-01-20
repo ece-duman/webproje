@@ -149,6 +149,9 @@ export default {
 </script>
 
 <style scoped>
+.header + .category-container {
+  margin-top: 10px; /* Header ile category-container arasında 10px boşluk bırakır */
+}
 /* İcon boyutunu küçültmek için */
 .icon-size {
   width: 24px;
@@ -168,10 +171,11 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  background-color: #56008E;
-  width: 100%;
-  padding: 10px 0;
+  background-color: #56008e;
+  width: auto;
+  padding: 0px 0;
   border-radius: 5px;
+  
 }
 
 /* Kategori metinlerinin stilini ayarlama */

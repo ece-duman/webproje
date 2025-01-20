@@ -124,21 +124,22 @@
 <style scoped>
 /* Sayfa arka planını mor yapma */
 body {
-  background-color: #6a0dad; /* Mor renk */
+  background-color: #56008e; /* Mor renk */
   color: white; /* Yazı rengi beyaz */
 }
 
 /* Sol alanın kutu şeklinde düzenlenmesi */
 .left-section {
-  background-color: #6a0dad;
+  background-color: #56008e;
   color: white;
   border-right: 2px solid white; /* Beyaz çizgi ile ayırma */
   padding: 20px;
+  
 }
 
 /* Sağ alan (sosyal medya ve telefon numarası) kutusu */
 .right-section {
-  background-color: #6a0dad; /* Mor arka plan */
+  background-color: #56008e; /* Mor arka plan */
   color: white; /* Beyaz yazı rengi */
   padding: 20px;
   border-left: 2px solid white; /* Beyaz çizgi ile ayırma */

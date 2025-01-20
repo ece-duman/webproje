@@ -24,9 +24,7 @@
                 {{ selectedProduct?.name || 'Siyam IV Mare' }}
               </p>
               <div class="price-wrapper">
-                <del class="text-gray text-delete price-old"
-                  >305,00 TL</del
-                >
+                <del class="text-gray text-delete price-old">305,00 TL</del>
                 <div class="current-price fw-black text-primary">
                   {{ selectedProduct?.price || '252,80 TL' }}
                 </div>
@@ -39,18 +37,32 @@
 
       <!-- Düğmeler -->
       <div class="popup-buttons">
-        <button @click="" class="btn btn-primary">SEPETE GİT</button>
+        <!-- Bu buton sidebar aç/kapa yapacak -->
+        <button @click="toggleCartSidebar" class="btn btn-primary">
+          SEPETE GİT
+        </button>
+
         <button @click="" class="btn btn-secondary">SATIN AL</button>
-        <!-- İsterseniz kapat butonu da ekleyebilirsiniz -->
-        <button @click="$emit('close-modal')" class="btn btn-secondary">KAPAT</button>
+        <!-- Modal Kapat Butonu -->
+        <button @click="$emit('close-modal')" class="btn btn-secondary">
+          KAPAT
+        </button>
       </div>
     </div>
   </div>
+
+  <!-- Sepet Bileşeni -->
+  <ComponentFive v-if="isCartVisible" @close="toggleCartSidebar" />
 </template>
 
 <script>
+import ComponentFive from './ComponentFive.vue'
+
 export default {
   name: 'ProductAddedModal',
+  components: {
+    ComponentFive,
+  },
   props: {
     selectedProduct: {
       type: Object,
@@ -59,24 +71,47 @@ export default {
   },
   data() {
     return {
-      // Bir default resim ayarlayabilirsiniz. Örneğin:
       defaultImage: 'https://www.kitapsepeti.com/siyam-545196-37-K.jpg',
-    };
+      isCartVisible: false, // Sepetin görünüp görünmediğini tutan değişken
+    }
   },
   methods: {
+    toggleCartSidebar() {
+      // Açık/kapalı durumu tersine çevirir
+      this.isCartVisible = !this.isCartVisible
+    },
     goToCart() {
-      // Sepet sayfasına yönlendirme
-      this.$router.push('/cart');
+      this.$router.push('/cart')
     },
     proceedToCheckout() {
-      // Satın alma sayfasına yönlendirme
-      this.$router.push('/checkout');
+      this.$router.push('/checkout')
     },
   },
-};
+}
 </script>
 
+
 <style scoped>
+/* Senin style kodların değişmedi. */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.popup-container {
+  background: #fff;
+  width: 570px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+}
 /* Genel Popup Stil */
 .popup-overlay {
   position: fixed;

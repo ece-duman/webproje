@@ -1,4 +1,5 @@
 <template>
+  <!-- daire şeklinde yayınevlerinin olduğu component. firebase'de yayinEvleri kısmı  -->
   <div class="slider-container">
     <div class="slider-icerik">
       <div class="slider-yazi">POPÜLER YAYINEVLERİ</div>
@@ -53,6 +54,48 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useYayinEvleriStore } from '~/stores/yayinEvleriStore';
+
+const images = ref([]); // Resimlerin tutulduğu dizi
+const currentIndex = ref(0); // Şu anki aktif indeks
+const trackRef = ref(null);
+
+// Pinia store'dan verileri al
+const yayinEvleriStore = useYayinEvleriStore();
+
+const updateTrackPosition = () => {
+  if (trackRef.value) {
+    const offset = -(currentIndex.value * (114 + 30)); // Görsel boyutu + margin
+    trackRef.value.style.transform = `translateX(${offset}px)`;
+  }
+};
+
+const prevSlide = () => {
+  currentIndex.value =
+    (currentIndex.value - 1 + images.value.length) % images.value.length;
+  updateTrackPosition();
+};
+
+const nextSlide = () => {
+  currentIndex.value = (currentIndex.value + 1) % images.value.length;
+  updateTrackPosition();
+};
+
+const startAutoSlide = () => {
+  setInterval(() => {
+    nextSlide();
+  }, 3000);
+};
+
+onMounted(async () => {
+  await yayinEvleriStore.fetchYayinEvleri(); // Store'dan verileri çek
+  images.value = yayinEvleriStore.images; // Store'daki verileri bileşene ata
+  startAutoSlide();
+});
+</script>
 
 <style>
 .slider-container {
@@ -117,7 +160,7 @@
 
 .slider-button {
   position: absolute;
-  display:flex;
+  display: flex;
   align-items: center;
   top: 50%;
   transform: translateY(-50%);
@@ -128,7 +171,6 @@
   height: 24px;
   cursor: pointer;
   z-index: 1000;
-
 }
 
 .slider-button.left {
@@ -139,90 +181,3 @@
   right: 22px;
 }
 </style>
-
-<script lang="ts">
-import { ref, onMounted } from 'vue';
-
-export default {
-  setup() {
-    const images = ref<string[]>([
-      "/items/marti-yayinlari-1-tr.jpg",
-      "/items/ephesus-yayinlari-2-tr.jpg",
-      "/items/dokuz-yayinlari-3-tr.jpg",
-      "/items/domingo-yayinevi-5-tr.jpg",
-      "/items/indigo-kitap-4-tr.jpg",
-      "/items/artemis-yayinlari-6-tr.jpg",
-      "/items/ren-kitap-7-tr.jpg",
-      "/items/epsilon-yayinevi-8-tr.jpg",
-      "/items/pegasus-yayinlari-9-tr.jpg",
-      "/items/is-bankasi-kultur-yayinlari-10-tr.jpg",
-      "/items/yapi-kredi-yayinlari-11-tr.jpg",
-      "/items/destek-yayinlari-12-tr.jpg",
-      "/items/sincap-kitap-13-tr.png",
-      "/items/can-cocuk-yayinlari-14-tr.jpg",
-      "/items/cezve-cocuk-15-tr.jpg",
-      "/items/ketebe-yayinlari-16-tr.jpg",
-      "/items/uc-dort-bes-yayinlari-17-tr.jpg",
-      "/items/antrenmanlarla-matematik-yayincilik-18-tr.jpg",
-      "/items/paraf-yayinlari-19-tr.jpg",
-      "/items/okyanus-yayinlari-20-tr.jpg"
-      
-      
-    ]);
-
-    const currentIndex = ref(0);
-    const trackRef = ref<HTMLElement | null>(null);
-    const autoSlideInterval = ref<NodeJS.Timeout | null>(null);
-
-    const updateTrackPosition = () => {
-      if (trackRef.value) {
-        const offset = -(currentIndex.value * (114 + 30)); // Görsel boyutu + margin
-        trackRef.value.style.transform = `translateX(${offset}px)`;
-      }
-    };
-
-    const prevSlide = () => {
-      currentIndex.value =
-        (currentIndex.value - 1 + images.value.length) % images.value.length;
-      updateTrackPosition();
-    };
-
-    const nextSlide = () => {
-      currentIndex.value = (currentIndex.value + 1) % images.value.length;
-      updateTrackPosition();
-    };
-
-    const startAutoSlide = () => {
-      autoSlideInterval.value = setInterval(() => {
-        nextSlide();
-      }, 3000);
-    };
-
-    const stopAutoSlide = () => {
-      if (autoSlideInterval.value) {
-        clearInterval(autoSlideInterval.value);
-        autoSlideInterval.value = null;
-      }
-    };
-
-    onMounted(() => {
-      // İlk ve son elemanların klonlanması
-      const clonesAtStart = images.value.slice(-8); // Sondan 8 eleman
-      const clonesAtEnd = images.value.slice(0, 8); // Baştan 8 eleman
-      images.value = [...clonesAtStart, ...images.value, ...clonesAtEnd];
-      startAutoSlide();
-    });
-
-    return {
-      images,
-      currentIndex,
-      prevSlide,
-      nextSlide,
-      stopAutoSlide,
-      trackRef,
-    };
-  },
-};
-</script>
-  
-  
