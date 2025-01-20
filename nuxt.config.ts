@@ -1,11 +1,9 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
-import { defineNuxtConfig } from 'nuxt/config';
-
 export default defineNuxtConfig({
+  modules: ['@pinia/nuxt'], // Pinia modülünü ekleyin
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   plugins: [
-    '~/plugins/firebase.js'
+    '~/plugins/firebase.ts'
   ],
   // CSS dosyalarını dahil et
   css: [
