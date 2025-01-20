@@ -9,7 +9,9 @@
     <ComponentTen/>
     <ComponentNine/>
     <ComponentTwo/>
+    <div style="width: 800px; height: 341px; background-color: transparent;"></div>
     <ComponentSix/>
+    <div style="width: 800px; height: 237px; background-color: transparent;"></div>
 
 </template>
 
